@@ -3,12 +3,14 @@ const itemsArray = localStorage.getItem('items') ? JSON.parse(localStorage.getIt
 document.querySelector("#enter").addEventListener("click", () => {
   const item = document.querySelector("#item");
   createItem(item);
+  item.value = ""; // Clear the input after creating the item
 });
 
 document.querySelector("#item").addEventListener("keypress", (e) => {
-  if(e.key === "Enter"){
+  if (e.key === "Enter") {
     const item = document.querySelector("#item");
     createItem(item);
+    item.value = ""; // Clear the input after creating the item
   }
 });
 
@@ -29,9 +31,9 @@ function displayDate() {
   }, 100); // Adjust typing speed as needed
 }
 
-function displayItems(){
+function displayItems() {
   let items = "";
-  for(let i = 0; i < itemsArray.length; i++){
+  for (let i = 0; i < itemsArray.length; i++) {
     items += `<div class="item">
                 <div class="input-controller">
                   <textarea disabled>${itemsArray[i]}</textarea>
@@ -44,6 +46,7 @@ function displayItems(){
                   <button class="saveBtn">Save</button>
                   <button class="cancelBtn">Cancel</button>
                 </div>
+                <span class="task-time">${formatDate(new Date())}</span> <!-- Add task creation time -->
               </div>`;
   }
   document.querySelector(".to-do-list").innerHTML = items;
@@ -53,26 +56,28 @@ function displayItems(){
   activateCancelListeners();
 }
 
-function activateDeleteListeners(){
+function activateDeleteListeners() {
   let deleteBtn = document.querySelectorAll(".deleteBtn");
   deleteBtn.forEach((dB, i) => {
-    dB.addEventListener("click", () => { deleteItem(i); });
+    dB.addEventListener("click", () => {
+      deleteItem(i);
+    });
   });
 }
 
-function activateEditListeners(){
+function activateEditListeners() {
   const editBtn = document.querySelectorAll(".editBtn");
   const updateController = document.querySelectorAll(".update-controller");
   const inputs = document.querySelectorAll(".input-controller textarea");
   editBtn.forEach((eB, i) => {
-    eB.addEventListener("click", () => { 
+    eB.addEventListener("click", () => {
       updateController[i].style.display = "block";
       inputs[i].disabled = false;
     });
   });
 }
 
-function activateSaveListeners(){
+function activateSaveListeners() {
   const saveBtn = document.querySelectorAll(".saveBtn");
   const inputs = document.querySelectorAll(".input-controller textarea");
   saveBtn.forEach((sB, i) => {
@@ -82,7 +87,7 @@ function activateSaveListeners(){
   });
 }
 
-function activateCancelListeners(){
+function activateCancelListeners() {
   const cancelBtn = document.querySelectorAll(".cancelBtn");
   const updateController = document.querySelectorAll(".update-controller");
   const inputs = document.querySelectorAll(".input-controller textarea");
@@ -95,25 +100,42 @@ function activateCancelListeners(){
   });
 }
 
-function createItem(item){
+function createItem(item) {
   itemsArray.push(item.value);
   localStorage.setItem('items', JSON.stringify(itemsArray));
   displayItems(); // Update the displayed items without reloading the page
 }
 
-function deleteItem(i){
-  itemsArray.splice(i,1);
+function deleteItem(i) {
+  itemsArray.splice(i, 1);
   localStorage.setItem('items', JSON.stringify(itemsArray));
   displayItems(); // Update the displayed items without reloading the page
 }
 
-function updateItem(text, i){
+function updateItem(text, i) {
   itemsArray[i] = text;
   localStorage.setItem('items', JSON.stringify(itemsArray));
   displayItems(); // Update the displayed items without reloading the page
 }
 
-window.onload = function() {
+// Function to format date as "Mon DD YYYY"
+function formatDate(date) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  return `${month} ${day} ${year}`;
+}
+
+// Add event listener to dynamically adjust text area height
+document.querySelectorAll('.input-controller textarea').forEach(textarea => {
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    });
+});
+
+window.onload = function () {
   displayDate();
   displayItems();
 };
